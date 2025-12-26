@@ -9,21 +9,6 @@ from handlers.settings import is_admin, get_current_admin_id
 
 router = Router()
 
-@router.message(Command("admin"))
-async def admin_panel(message: Message):
-    """Админ панель"""
-    if not is_admin(message.from_user.id):
-        await message.answer("❌ У вас нет доступа к админ панели")
-        return
-    
-    text = """
-🔐 **Админ панель**
-
-Выберите действие:
-"""
-    
-    await message.answer(text, reply_markup=get_admin_menu(), parse_mode="Markdown")
-
 @router.message(F.text == "💰 Проверить платежи")
 async def check_payments(message: Message):
     """Проверка платежей"""

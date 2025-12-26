@@ -6,6 +6,8 @@ from aiogram.fsm.state import State, StatesGroup
 
 from database.db import add_user, get_days_left, get_schedule
 from keyboards.client_kb import get_main_menu, get_subscription_menu, get_schedule_menu, get_back_button
+from keyboards.admin_kb import get_admin_menu
+from handlers.settings import is_admin
 from config import SUBSCRIPTION_PRICES
 from datetime import datetime
 
@@ -23,7 +25,20 @@ async def cmd_start(message: Message):
         first_name=message.from_user.first_name
     )
     
-    welcome_text = f"""
+    # Проверяем - админ или клиент
+    if is_admin(message.from_user.id):
+        # Админ меню
+        text = f"""
+🔐 **Админ-панель**
+
+Привет, {message.from_user.first_name}!
+
+Выбери действие:
+"""
+        await message.answer(text, reply_markup=get_admin_menu(), parse_mode="Markdown")
+    else:
+        # Клиент меню
+        welcome_text = f"""
 👋 Привет, {message.from_user.first_name}!
 
 Добро пожаловать в клуб byAlina! 💪
@@ -35,8 +50,7 @@ async def cmd_start(message: Message):
 
 Выбери действие в меню ниже 👇
 """
-    
-    await message.answer(welcome_text, reply_markup=get_main_menu())
+        await message.answer(welcome_text, reply_markup=get_main_menu())
 
 @router.message(F.text == "📅 Дней до окончания")
 async def check_subscription(message: Message):
